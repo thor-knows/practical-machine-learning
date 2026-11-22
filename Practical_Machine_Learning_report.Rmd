@@ -1,0 +1,185 @@
+---
+title: "Predicting weightlifting exercise quality"
+author: "arun siva"
+date: "11/22/2026"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+# Load your saved machine learning workspace
+load("~/practical machine learning final.RData")
+
+# Load the necessary packages
+library(caret)
+library(randomForest)
+
+# Configure R Markdown
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE
+)
+```
+
+
+## R Markdown
+
+The Random Forest model achieved 99.53% validation
+accuracy, corresponding to an estimated
+out-of-sample error of 0.47%.
+
+```{r}
+# Calculate validation accuracy
+accuracy <- mean(validation_predictions == validation$classe)
+
+# Calculate classification error
+error_rate <- 1 - accuracy
+
+print(accuracy)
+print(error_rate)
+```
+
+## Discussion
+
+The results indicate strong classification performance.
+However, the random split included observations from
+the same participants in both training and validation sets. # Predicting Weightlifting Exercise Quality Using Random Forest
+
+
+# Predicting Weightlifting Exercise Quality Using Random Forest
+
+## 1. Introduction
+
+This project aimed to predict the quality of weightlifting
+exercise performance using measurements from wearable
+motion sensors. Six participants performed exercises
+correctly and incorrectly in five different ways.
+
+The outcome variable, `classe`, identifies five exercise
+categories (A, B, C, D, and E).
+
+## 2. Data Preparation
+
+The original dataset contained 19,622 observations
+and 160 columns.
+
+I selected 52 motion-sensor measurements from the belt,
+arm, forearm, and dumbbell.
+
+I excluded participant identifiers, timestamps,
+administrative variables, and measurements with
+substantial missing data.
+
+The cleaned dataset contained 52 predictors and
+one categorical outcome variable.
+
+## 3. Model Development
+
+I divided the dataset into:
+
+- 75% training data: 14,718 observations.
+- 25% validation data: 4,904 observations.
+
+I trained a Random Forest classifier using five-fold
+cross-validation.
+
+I compared `mtry` values of 4 and 10 using 150 trees
+per forest.
+
+The selected model used `mtry = 10`.
+
+## 4. Model Performance
+
+The model achieved:
+
+- Five-fold cross-validation accuracy: **99.32%**
+- Validation accuracy: **99.53%**
+- Estimated out-of-sample error: **0.47%**
+- Cohen's kappa: **0.9941**
+
+The model correctly classified 4,881 of 4,904
+validation observations, making 23 errors.
+
+### Confusion Matrix
+
+```{r confusion-matrix}
+print(cm)
+```
+
+### Model Statistics
+
+```{r model-statistics}
+data.frame(
+  Metric = c(
+    "Validation accuracy",
+    "Out-of-sample error",
+    "Cross-validation accuracy"
+  ),
+  Percentage = round(
+    c(
+      accuracy,
+      error_rate,
+      max(rf_model$results$Accuracy)
+    ) * 100,
+    2
+  )
+)
+```
+
+## 5. Final Predictions
+
+I retrained the final Random Forest model using all
+19,622 labelled observations, with 300 trees and
+`mtry = 10`.
+
+The model predicted the exercise classes of the
+20 unlabelled test observations.
+
+```{r final-predictions}
+knitr::kable(
+  results,
+  caption = "Predicted exercise classes for the 20 test cases"
+)
+```
+
+## 6. Discussion and Limitations
+
+Random Forest was selected because it can identify
+nonlinear relationships and interactions among
+motion-sensor measurements.
+
+Five-fold cross-validation was used for model selection,
+while the held-out validation set was used to estimate
+performance on unseen observations.
+
+One important limitation is that repeated measurements
+from the same participants may occur in both training
+and validation sets.
+
+Consequently, the estimated error rate may be
+optimistic for completely new participants.
+
+A participant-level validation strategy would provide
+a stronger assessment of model generalizability.
+
+## 7. Conclusion
+
+The Random Forest classifier achieved 99.53% validation
+accuracy and an estimated out-of-sample error of 0.47%.
+
+These results demonstrate that machine learning can
+accurately distinguish exercise-performance categories
+within this dataset.
+
+Further validation involving previously unseen
+participants is necessary before applying the model
+to new users.
+
+## Reference
+
+Velloso, E., Bulling, A., Gellersen, H., Ugulino, W.,
+& Fuks, H. (2013). Qualitative Activity Recognition
+of Weight Lifting Exercises. Proceedings of the
+4th Augmented Human International Conference,
+116–123.
